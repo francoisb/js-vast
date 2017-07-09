@@ -1,81 +1,68 @@
-"use strict";
-(function () {
+module.models.Tracking = (function() {
 
-    function setup() {
+    /**
+     * VastModelTracking model constructor.
+     */
+    function VastModelTracking() {
+        this._events = [];
+    };
+    VastModelTracking.prototype.constructor = VastModelTracking;
 
-        /**
-         * VastModelTracking model constructor.
-         */
-        function VastModelTracking() {
-            this._events = [];
-        };
-        VastModelTracking.prototype.constructor = VastModelTracking;
+    VastModelTracking.prototype.addEvent = function(name, url) {
+        this._events.push({ name: name, url: url });
+        return this;
+    };
 
-        VastModelTracking.prototype.addEvent = function(name, url) {
-            this._events.push({ name: name, url: url });
-            return this;
-        };
+    VastModelTracking.prototype.hasEvent = function(name) {
+        var results = [];
 
-        VastModelTracking.prototype.hasEvent = function(name) {
-            var results = [];
-
-            name = name.toLowerCase();
-            for (var i=0; i<this._events.length; i++) {
-                if (this._events[i].name.toLowerCase() === name) {
-                    return true;
-                }
+        name = name.toLowerCase();
+        for (var i=0; i<this._events.length; i++) {
+            if (this._events[i].name.toLowerCase() === name) {
+                return true;
             }
+        }
 
-            return false;
-        };
+        return false;
+    };
 
-        VastModelTracking.prototype.getEvent = function(name) {
-            var results = [];
+    VastModelTracking.prototype.getEvent = function(name) {
+        var results = [];
 
-            name = name.toLowerCase();
-            for (var i=0; i<this._events.length; i++) {
-                if (this._events[i].name.toLowerCase() === name) {
-                    results.push(this._events[i].url);
-                }
+        name = name.toLowerCase();
+        for (var i=0; i<this._events.length; i++) {
+            if (this._events[i].name.toLowerCase() === name) {
+                results.push(this._events[i].url);
             }
+        }
 
-            return results;
-        };
+        return results;
+    };
 
-        VastModelTracking.prototype.send = function(name) {
-            var
-                senders = [],
-                urls    = this.getEvent(name);
+    VastModelTracking.prototype.send = function(name) {
+        var
+            senders = [],
+            urls    = this.getEvent(name);
 
-            if (urls.length) {
-                for (var i=0; i<urls.length; i++) {
-                    senders.push(new Image(1,1));
-                    senders[i].src = urls[i];
-                }
+        if (urls.length) {
+            for (var i=0; i<urls.length; i++) {
+                senders.push(new Image(1,1));
+                senders[i].src = urls[i];
             }
+        }
 
-            return results;
-        };
+        return results;
+    };
 
-        VastModelTracking.prototype.clone = function() {
-            var result = new this.constructor();
+    VastModelTracking.prototype.clone = function() {
+        var result = new this.constructor();
 
-            result._events = this._events.slice(0);
+        result._events = this._events.slice(0);
 
-            return result;
-        };
-
-
-        return VastModelTracking;
+        return result;
     };
 
 
-    if (typeof define === "function" && define.amd) {
-        define('vast/models/tracking', [], setup);
-    } else if (typeof window === "object" && typeof window.document === "object") {
-        window.Vast                 = window.Vast || {};
-        window.Vast.Models          = window.Vast.Models || {};
-        window.Vast.Models.Tracking = window.Vast.Models.Tracking || setup();
-    }
+    return VastModelTracking;
 
 })();
