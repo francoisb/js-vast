@@ -1,0 +1,15 @@
+{
+  "name": "js-vastclient",
+  "description": "JS VASTCLIENT deployment using Grunt.",
+  "author": "François Béliveau",
+  "private": true,
+  "engine": "node >= 7.6.0",
+  "dependencies": {
+    "grunt": "1.0.1",
+    "grunt-contrib-clean": "1.0.0",
+    "grunt-contrib-concat": "1.0.1",
+    "grunt-contrib-uglify": "2.2.0",
+    "grunt-contrib-jasmine": "1.1.0",
+    "grunt-template-jasmine-nml": "2.0.1"
+  }
+}
