@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo ""
-echo -e "\e[1;36mJS-VASTCLIENT - Init\e[0m"
+echo -e "\e[1;36mJS-VAST - Init\e[0m"
 echo ""
 
 

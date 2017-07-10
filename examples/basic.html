@@ -1,0 +1,46 @@
+<html>
+<head>
+    <title>js-vast - basic example</title>
+    <script src="../build/js-vast.min.js"></script>
+</head>
+<body>
+    <script>
+        (function(JsVastClient) {
+            var vastClient = new JsVastClient();
+
+            vastClient.bind('empty', function() {
+                window.console && console.log && console.log('VastClient', 'empty');
+            });
+            vastClient.bind('error', function() {
+                 window.console && console.log && console.log('VastClient', 'error');
+            });
+            vastClient.bind('xml.parsed', function() {
+                 window.console && console.log && console.log('VastClient', 'xml.parsed');
+            });
+            vastClient.bind('xml.error', function() {
+                window.console && console.log && console.log('VastClient', 'xml.error');
+            });
+            vastClient.bind('player.error', function() {
+                window.console && console.log && console.log('VastClient', 'player.error');
+            });
+            vastClient.bind('player.ready', function(player, playerObject, creative, parameters) {
+                window.console && console.log && console.log('VastClient', 'player.ready', {
+                    player: player,
+                    playerObject: playerObject,
+                    creative: creative,
+                    parameters: parameters
+                });
+            });
+            vastClient.bind('player.ad.complete', function() {
+                window.console && console.log && console.log('VastClient', 'player.ad.complete');
+            });
+            vastClient.bind('player.ad.error', function() {
+                window.console && console.log && console.log('VastClient', 'player.ad.error');
+            });
+
+            vastClient.run('../tests/data/vast_inline_nonlinear.xml');
+
+        })(window['js-vast'].Client);
+    </script>
+</body>
+</html>

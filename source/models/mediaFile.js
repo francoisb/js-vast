@@ -1,4 +1,4 @@
-module.models.MediaFile = (function(Modernizr, VastPlayerMediaFileFlash, VastPlayerMediaFileHtml5) {
+module.models.MediaFile = (function(VastPlayerMediaFileFlash, VastPlayerMediaFileHtml5) {
 
     /**
      * MEDIAFILE model constructor.
@@ -39,17 +39,17 @@ module.models.MediaFile = (function(Modernizr, VastPlayerMediaFileFlash, VastPla
                     case 'video/x-flv':
                         return VastPlayerMediaFileFlash;
                     case 'video/mp4':
-                        if (Modernizr && Modernizr.video && Modernizr.video.h264) {
+                        if (module.compatibility.video && module.compatibility.video.h264) {
                             return VastPlayerMediaFileHtml5;
                         }
                         return null;
                     case 'video/webm':
-                        if (Modernizr && Modernizr.video && Modernizr.video.webm) {
+                        if (module.compatibility.video && module.compatibility.video.webm) {
                             return VastPlayerMediaFileHtml5;
                         }
                         return null;
                     case 'video/ogg':
-                        if (Modernizr && Modernizr.video && Modernizr.video.ogg) {
+                        if (module.compatibility.video && module.compatibility.video.ogg) {
                             return VastPlayerMediaFileHtml5;
                         }
                         return null;
@@ -77,4 +77,4 @@ module.models.MediaFile = (function(Modernizr, VastPlayerMediaFileFlash, VastPla
 
     return VastModelMediaFile;
 
-})(Modernizr, module.players.mediafile.Flash, module.players.mediafile.Html5);
+})(module.players.mediafile.Flash, module.players.mediafile.Html5);

@@ -1,4 +1,4 @@
-module.players.mediafile.Html5 = (function(Modernizr, VastPlayerBase) {
+module.players.mediafile.Html5 = (function(VastPlayerBase) {
 
     var _uniqId = 0;
 
@@ -17,7 +17,7 @@ module.players.mediafile.Html5 = (function(Modernizr, VastPlayerBase) {
     Object.defineProperties(VastPlayerMediaFileHtml5, {
         compatible: {
              get: function () {
-                return Modernizr && Modernizr.video;
+                return module.compatibility.video;
              }
         }
     });
@@ -194,4 +194,4 @@ module.players.mediafile.Html5 = (function(Modernizr, VastPlayerBase) {
 
     return VastPlayerMediaFileHtml5;
 
-})(Modernizr, module.players.Base);
+})(module.players.Base);

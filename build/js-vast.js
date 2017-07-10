@@ -1,4 +1,4 @@
-/* js-vastclient - https://github.com/francoisb/js-vastclient */
+/* js-vast - https://github.com/francoisb/js-vast */
 "use strict";
 (function(name, dependencies, context, definition) {
 
@@ -24,9 +24,10 @@
         context[name] = definition.call(context, dependencies);
     }
 
-})('js-vastclient', ['Modernizr'], (this || {}), function() {
+})('js-vast', [], (this || {}), function() {
 
     var module = {
+        compatibility: {},
         models:  {},
         players: {
             companion: {},
@@ -35,6 +36,27 @@
         xml:     {}
     };
 
+
+module.compatibility.video = (function() {
+
+    var
+        result,
+        yes      = ['probably', 'maybe'],
+        videoElm = document.createElement('video');
+
+    if (typeof videoElm !== 'undefined' && videoElm.canPlayType) {
+        result = {
+            ogg:  yes.indexOf(videoElm.canPlayType('video/ogg; codecs="theora"')) !== -1,
+            h264: yes.indexOf(videoElm.canPlayType('video/mp4; codecs="avc1.42E01E"')) !== -1,
+            webm: yes.indexOf(videoElm.canPlayType('video/webm; codecs="vp8, vorbis"')) !== -1
+        };
+    } else {
+        result = false;
+    }
+
+    return result;
+
+})();
 
 module.players.Base = (function() {
 
@@ -526,7 +548,7 @@ module.players.mediafile.Flash = (function(VastPlayerBase) {
 
 })(module.players.Base);
 
-module.players.mediafile.Html5 = (function(Modernizr, VastPlayerBase) {
+module.players.mediafile.Html5 = (function(VastPlayerBase) {
 
     var _uniqId = 0;
 
@@ -545,7 +567,7 @@ module.players.mediafile.Html5 = (function(Modernizr, VastPlayerBase) {
     Object.defineProperties(VastPlayerMediaFileHtml5, {
         compatible: {
              get: function () {
-                return Modernizr && Modernizr.video;
+                return module.compatibility.video;
              }
         }
     });
@@ -722,7 +744,7 @@ module.players.mediafile.Html5 = (function(Modernizr, VastPlayerBase) {
 
     return VastPlayerMediaFileHtml5;
 
-})(Modernizr, module.players.Base);
+})(module.players.Base);
 
 module.models.Tracking = (function() {
 
@@ -1115,6 +1137,87 @@ module.models.CreativeLinear = (function(VastModelTracking) {
 
 })(module.models.Tracking);
 
+module.models.MediaFile = (function(VastPlayerMediaFileFlash, VastPlayerMediaFileHtml5) {
+
+    /**
+     * MEDIAFILE model constructor.
+     *
+     * @param   {string}        url                 Location of file.
+     * @param   {string}        delivery            Method of delivery of ad. ['streaming', 'progressive']
+     * @param   {string}        mimetype            MIME type. Popular MIME types include, but are not limited to “video/x-ms-wmv” for Windows Media, and “video/x-flv” for Flash Video.
+     * @param   {string}        api                 The apiFramework defines the method to use for communication if the MediaFile is interactive. Suggested values for this element are “VPAID”, “FlashVars” (for Flash/Flex), “initParams” (for Silverlight) and “GetVariables” (variables placed in key/value pairs on the asset request).
+     * @param   {integer}       bitrate             Bitrate of encoded video in Kbps.
+     * @param   {integer}       width               Pixel dimensions of video.
+     * @param   {integer}       height              Pixel dimensions of video.
+     *
+     */
+    function VastModelMediaFile(url, delivery, mimetype, api, bitrate, width, height) {
+        this.url      = url;
+        this.delivery = delivery;
+        this.mimetype = mimetype;
+        this.api      = api;
+        this.bitrate  = bitrate;
+        this.width    = width;
+        this.height   = height;
+    };
+    VastModelMediaFile.prototype.constructor = VastModelMediaFile;
+
+    /**
+     * Instance properties.
+     */
+    Object.defineProperties(VastModelMediaFile.prototype, {
+        player: {
+            /**
+             * Get VastPlayerMediaFile.
+             *
+             * @returns {VastPlayerMediaFile}
+             */
+            get: function() {
+                switch (this.mimetype) {
+                    case 'application/x-shockwave-flash':
+                    case 'video/x-flv':
+                        return VastPlayerMediaFileFlash;
+                    case 'video/mp4':
+                        if (module.compatibility.video && module.compatibility.video.h264) {
+                            return VastPlayerMediaFileHtml5;
+                        }
+                        return null;
+                    case 'video/webm':
+                        if (module.compatibility.video && module.compatibility.video.webm) {
+                            return VastPlayerMediaFileHtml5;
+                        }
+                        return null;
+                    case 'video/ogg':
+                        if (module.compatibility.video && module.compatibility.video.ogg) {
+                            return VastPlayerMediaFileHtml5;
+                        }
+                        return null;
+                    default:
+                        return null;
+                }
+            }
+        }
+    });
+
+    VastModelMediaFile.prototype.clone = function() {
+        var result = new this.constructor(
+            this.url, 
+            this.delivery,
+            this.mimetype, 
+            this.api, 
+            this.bitrate, 
+            this.width, 
+            this.height
+        );
+
+        return result;
+    };
+
+
+    return VastModelMediaFile;
+
+})(module.players.mediafile.Flash, module.players.mediafile.Html5);
+
 module.xml.Loader = (function() {
 
     function VastXmlLoaderCompatibilityError(message) {
@@ -1203,7 +1306,7 @@ module.xml.Loader = (function() {
                 }
             });
         } else {
-            xhttp = _xhhtpCreator();
+            var xhttp = _xhhtpCreator();
 
             xhttp.overrideMimeType('text/xml');
             xhttp.open("GET", this.url, false);
@@ -1621,7 +1724,7 @@ module.xml.Parser = (function(VastXmlLoader, VastModelAd, VastModelCompanion, Va
 
 })(module.xml.Loader, module.models.Ad, module.models.Companion, module.models.CreativeCompanion, module.models.CreativeLinear, module.models.MediaFile, module.models.Tracking);
 
-module.VastClient = (function(VastXmlLoader, VastXmlParser) {
+module.Client = (function(VastXmlLoader, VastXmlParser) {
 
     /**
      * VastClient constructor.

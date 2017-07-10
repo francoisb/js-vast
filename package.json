@@ -1,6 +1,6 @@
 {
-  "name": "js-vastclient",
-  "description": "JS VASTCLIENT deployment using Grunt.",
+  "name": "js-vast",
+  "description": "JS VAST deployment using Grunt.",
   "author": "François Béliveau",
   "private": true,
   "engine": "node >= 7.6.0",

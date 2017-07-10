@@ -1,4 +1,4 @@
-module.VastClient = (function(VastXmlLoader, VastXmlParser) {
+module.Client = (function(VastXmlLoader, VastXmlParser) {
 
     /**
      * VastClient constructor.

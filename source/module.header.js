@@ -23,9 +23,10 @@
         context[name] = definition.call(context, dependencies);
     }
 
-})('js-vastclient', ['Modernizr'], (this || {}), function() {
+})('js-vast', [], (this || {}), function() {
 
     var module = {
+        compatibility: {},
         models:  {},
         players: {
             companion: {},

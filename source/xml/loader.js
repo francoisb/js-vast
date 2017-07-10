@@ -86,7 +86,7 @@ module.xml.Loader = (function() {
                 }
             });
         } else {
-            xhttp = _xhhtpCreator();
+            var xhttp = _xhhtpCreator();
 
             xhttp.overrideMimeType('text/xml');
             xhttp.open("GET", this.url, false);

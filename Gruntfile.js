@@ -1,12 +1,12 @@
 module.exports = function(grunt) {
     var
         _config,
-        _banner = '/* js-vastclient - https://github.com/francoisb/js-vastclient */\n';
+        _banner = '/* js-vast - https://github.com/francoisb/js-vast */\n';
 
     _config = {
         clean: {
             build: {
-                src: [ 'js-vastclient.js', 'js-vastclient.min.js' ]
+                src: [ 'js-vast.js', 'js-vast.min.js' ]
             }
         },
 
@@ -14,6 +14,7 @@ module.exports = function(grunt) {
             build: {
                 src:     [
                             'source/module.header.js',
+                            'source/compatibility/video.js',
                             'source/players/base.js',
                             'source/players/companion/html.js',
                             'source/players/companion/iframe.js',
@@ -31,7 +32,7 @@ module.exports = function(grunt) {
                             'source/client.js',
                             'source/module.footer.js',
                          ],
-                dest:    'build/js-vastclient.js',
+                dest:    'build/js-vast.js',
                 options: {
                              stripBanners: true,
                              banner:       _banner,
@@ -55,13 +56,13 @@ module.exports = function(grunt) {
                 },
                 files: [{
                     expand: false,
-                    src:    'build/js-vastclient.js',
-                    dest:   'build/js-vastclient.min.js'
+                    src:    'build/js-vast.js',
+                    dest:   'build/js-vast.min.js'
                 }]
             }
         },
         jasmine: {
-            src: 'build/js-vastclient.js',
+            src: 'build/js-vast.js',
             options: {
                 specs:    'tests/*Spec.js',
                 template: require('grunt-template-jasmine-nml'),
@@ -80,11 +81,11 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-jasmine');
 
     // define the tasks
-    grunt.registerTask('test', 'Run js-vastclient tests.', [
+    grunt.registerTask('test', 'Run js-vast tests.', [
         'jasmine'
     ]);
     // define the tasks
-    grunt.registerTask('build', 'Build js-vastclient.', [
+    grunt.registerTask('build', 'Build js-vast.', [
         'clean:build',
         'concat:build',
         'uglify:build'
