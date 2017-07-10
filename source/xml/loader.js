@@ -56,7 +56,7 @@ module.xml.Loader = (function() {
      * @public
      * @returns {Self}
      */
-    VastXmlLoader.prototype.load = function(url) {
+    VastXmlLoader.prototype.load = function(url, onSuccess, onError) {
         if (url && url !== this.url) {
             this.url      = url;
             this._content = null;
@@ -70,18 +70,17 @@ module.xml.Loader = (function() {
             throw new VastXmlLoaderParameterError('An url is required!');
         }
 
-        var xmlDoc;
-
         if (window.jQuery && window.jQuery.ajax) {
             window.jQuery.ajax({
-                async:    false,
+                async:    true,
                 type:     'GET',
                 url:      url,
                 dataType: 'xml',
                 success: function (xml) {
-                    xmlDoc = xml;
+                    onSuccess(xml);
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
+                    onError(textStatus, errorThrown);
                     throw new VastXmlLoaderCompatibilityError(textStatus);
                 }
             });
@@ -89,13 +88,25 @@ module.xml.Loader = (function() {
             var xhttp = _xhhtpCreator();
 
             xhttp.overrideMimeType('text/xml');
-            xhttp.open("GET", this.url, false);
+            xhttp.onload = function() {
+                if (xhttp.readyState === 4) {
+                    if (xhttp.status === 200) {
+                        onSuccess(xhttp.responseXML);
+                    } else {
+                        onError(textStatus, null);
+                        throw new VastXmlLoaderCompatibilityError(xhttp.statusText);
+                    }
+                }
+            };
+            xhttp.onerror = function(err) {
+                onError(textStatus, err);
+                throw new VastXmlLoaderCompatibilityError(xhttp.statusText);
+            };
+            xhttp.open('GET', this.url, false);
             xhttp.send(null);
-
-            xmlDoc = xhttp.responseXML;
         }
 
-        return xmlDoc;
+        return this;
     };
 
 

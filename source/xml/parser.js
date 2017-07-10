@@ -384,7 +384,7 @@ module.xml.Parser = (function(VastXmlLoader, VastModelAd, VastModelCompanion, Va
         }
 
         if (!this.valid) {
-            throw new VastXmlParserInvalidError('Xml is not a valid VAST format.');
+            throw new VastXmlParserInvalidError('The resource is not a valid VAST format.');
         }
 
         if (this._parsedContent === null) {

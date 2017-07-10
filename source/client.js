@@ -136,72 +136,76 @@ module.Client = (function(VastXmlLoader, VastXmlParser) {
      * @returns {Self}
      */
     VastClient.prototype.run = function(vastUrl) {
-        var xmlDoc = this._xmlLoader.load(vastUrl);
-        this.trigger('xml.loaded', [xmlDoc]);
+        var self = this;
 
-        var vastData = this._xmlParser.parse(xmlDoc);
-        this.trigger('xml.parsed', [vastData]);
+        var xmlDoc = this._xmlLoader.load(vastUrl, function(xmlDoc) {
+            self.trigger('xml.loaded', [xmlDoc]);
 
-        var
-            ad, creative, playerObject,
-            self   = this,
-            player = null;
+            var vastData = self._xmlParser.parse(xmlDoc);
+            self.trigger('xml.parsed', [vastData]);
 
-        if (vastData) {
-            for (var i=0; i<vastData.length; i++) {
-                if (player) {
-                    break;
-                }
+            var
+                ad, creative, playerObject,
+                player = null;
 
-                ad = vastData[i];
-
-                for (var ii=0; ii<ad.creatives.length; ii++) {
+            if (vastData) {
+                for (var i=0; i<vastData.length; i++) {
                     if (player) {
                         break;
                     }
 
-                    creative = ad.creatives[ii];
+                    ad = vastData[i];
 
-                    if (creative.type === 'linear') {
-                        for (var iii=0; iii<creative.mediafiles.length; iii++) {
-                            if (player) {
-                                break;
-                            }
-                            playerObject = creative.mediafiles[iii];
-                            if (playerObject.player) {
-                                player = new playerObject.player(this.container);
-                                if (!player.compatible) {
-                                    player = null;
+                    for (var ii=0; ii<ad.creatives.length; ii++) {
+                        if (player) {
+                            break;
+                        }
+
+                        creative = ad.creatives[ii];
+
+                        if (creative.type === 'linear') {
+                            for (var iii=0; iii<creative.mediafiles.length; iii++) {
+                                if (player) {
+                                    break;
+                                }
+                                playerObject = creative.mediafiles[iii];
+                                if (playerObject.player) {
+                                    player = new playerObject.player(self.container);
+                                    if (!player.compatible) {
+                                        player = null;
+                                    }
                                 }
                             }
-                        }
-                    } else if (creative.type === 'companion') {
-                        for (var iii=0; iii<creative.companions.length; iii++) {
-                            if (player) {
-                                break;
-                            }
-                            playerObject = creative.companions[iii];
-                            if (playerObject.player) {
-                                player = new playerObject.player(this.container);
-                                if (!player.compatible) {
-                                    player = null;
+                        } else if (creative.type === 'companion') {
+                            for (var iii=0; iii<creative.companions.length; iii++) {
+                                if (player) {
+                                    break;
+                                }
+                                playerObject = creative.companions[iii];
+                                if (playerObject.player) {
+                                    player = new playerObject.player(self.container);
+                                    if (!player.compatible) {
+                                        player = null;
+                                    }
                                 }
                             }
                         }
                     }
                 }
             }
-        }
 
-        if (!player) {
-            this.trigger('empty', [vastData]);
-            return this;
-        }
+            if (!player) {
+                self.trigger('empty', [vastData]);
+                return;
+            }
 
-        player.bind('*', function(key, parameters) {
-            self.trigger('player.' + key, [player, playerObject, creative, parameters]);
+            player.bind('*', function(key, parameters) {
+                self.trigger('player.' + key, [player, playerObject, creative, parameters]);
+            });
+            player.print(ad, playerObject, creative.playerParameters);
+        }, function(status, err) {
+            // an error occured on the loading step
         });
-        player.print(ad, playerObject, creative.playerParameters);
 
         return this;
     };

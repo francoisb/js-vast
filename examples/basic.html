@@ -4,6 +4,15 @@
     <script src="../build/js-vast.min.js"></script>
 </head>
 <body>
+    <h1>JS-VAST - basic example</h1>
+    <p>For more information please visit <a href="https://github.com/francoisb/js-vast">https://github.com/francoisb/js-vast</a></p>
+
+    <form id="test-form">
+        <label>VAST resource url : <input type="text" id="vast-url" /></label>
+        <button type="submit">Ok</button>
+    </form>
+
+    <div>
     <script>
         (function(JsVastClient) {
             var vastClient = new JsVastClient();
@@ -13,6 +22,9 @@
             });
             vastClient.bind('error', function() {
                  window.console && console.log && console.log('VastClient', 'error');
+            });
+            vastClient.bind('xml.loaded', function(xmlDoc) {
+                 window.console && console.log && console.log('VastClient', 'xml.loaded', xmlDoc);
             });
             vastClient.bind('xml.parsed', function() {
                  window.console && console.log && console.log('VastClient', 'xml.parsed');
@@ -38,9 +50,32 @@
                 window.console && console.log && console.log('VastClient', 'player.ad.error');
             });
 
-            vastClient.run('../tests/data/vast_inline_nonlinear.xml');
+            document.getElementById('test-form').addEventListener('submit', function(event) {
+                event.stopPropagation();
+                event.preventDefault();
+
+                function isURL(str) {
+                    var pattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
+                    '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.?)+[a-z]{2,}|'+ // domain name
+                    '((\\d{1,3}\\.){3}\\d{1,3}))'+ // OR ip (v4) address
+                    '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // port and path
+                    '(\\?[;&a-z\\d%_.~+=-]*)?'+ // query string
+                    '(\\#[-a-z\\d_]*)?$','i'); // fragment locator
+                    return pattern.test(str);
+                }
+
+                var vastUrl = document.getElementById('vast-url').value;
+
+                if (isURL(vastUrl)) {
+                    vastClient.run(vastUrl);
+                } else {
+                    alert('A valid VAST url is required !');
+                }
+                
+            }, false);
 
         })(window['js-vast'].Client);
     </script>
+    </div>
 </body>
 </html>
