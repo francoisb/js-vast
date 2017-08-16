@@ -106,7 +106,7 @@ module.xml.Parser = (function(VastXmlLoader, VastModelAd, VastModelCompanion, Va
     function _parseMediaFiles(xmlNode) {
         var 
             i, 
-            nodes   = _childsByName(_childByName(xmlNode, 'MediaFiles'), 'MediaFile');
+            nodes   = _childsByName(_childByName(xmlNode, 'MediaFiles'), 'MediaFile'),
             results = [];
 
         if (nodes && nodes.length) {
@@ -283,28 +283,30 @@ module.xml.Parser = (function(VastXmlLoader, VastModelAd, VastModelCompanion, Va
 
             if (adRecord.isWrapper) {
                 (function() {
-                    var
-                        _xmlDoc, 
-                        _xmlLoader = new VastXmlLoader();
+                    var _xmlLoader = new VastXmlLoader();
 
-                    nodes = node.getElementsByTagName("VASTAdTagURI");
-                    if (nodes && nodes.length > 0) {
-                        _xmlDoc = _xmlLoader.load(_parseNodeText(nodes[0]));
-                    } else {
-                        nodes = node.getElementsByTagName("VASTAdTagURL");
-                        if (nodes && nodes.length > 0) {
-                            _xmlDoc = _xmlLoader.load(_parseNodeText(nodes[0]));
-                        }
-                    }
-
-                    if (_xmlDoc) {
-                        nodes = _xmlDoc.getElementsByTagName('InLine');
-                        if (nodes && nodes.length > 0) {
-                            for (var y=0; y<nodes.length; y++) {
-                                adRecord = __createOrEnhanceRecord(id, nodes[y], adRecord);
+                    function __parseInLine(xmlDoc) {
+                        if (xmlDoc) {
+                            nodes = xmlDoc.getElementsByTagName('InLine');
+                            if (nodes && nodes.length > 0) {
+                                for (var y=0; y<nodes.length; y++) {
+                                    adRecord = __createOrEnhanceRecord(id, nodes[y], adRecord);
+                                }
                             }
                         }
                     }
+
+                    nodes = node.getElementsByTagName("VASTAdTagURI");
+                    if (nodes && nodes.length > 0) {
+                        _xmlLoader.load(_parseNodeText(nodes[0]), __parseInLine);
+                    } else {
+                        nodes = node.getElementsByTagName("VASTAdTagURL");
+                        if (nodes && nodes.length > 0) {
+                            xmlLoader.load(_parseNodeText(nodes[0]), __parseInLine);
+                        }
+                    }
+
+                   
                 })();
             }
 

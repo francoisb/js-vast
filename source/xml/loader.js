@@ -91,18 +91,22 @@ module.xml.Loader = (function() {
             xhttp.onload = function() {
                 if (xhttp.readyState === 4) {
                     if (xhttp.status === 200) {
-                        onSuccess(xhttp.responseXML);
+                        if (typeof onSuccess === 'function') {
+                            onSuccess(xhttp.responseXML);
+                        }
                     } else {
-                        onError(textStatus, null);
+                        if (typeof onError === 'function') {
+                            onError(xhttp.statusText, null);
+                        }
                         throw new VastXmlLoaderCompatibilityError(xhttp.statusText);
                     }
                 }
             };
             xhttp.onerror = function(err) {
-                onError(textStatus, err);
+                onError(xhttp.statusText, err);
                 throw new VastXmlLoaderCompatibilityError(xhttp.statusText);
             };
-            xhttp.open('GET', this.url, false);
+            xhttp.open('GET', this.url, true);
             xhttp.send(null);
         }
 
